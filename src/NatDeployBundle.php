@@ -2,6 +2,7 @@
 
 namespace Nat\DeployBundle;
 
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class NatDeployBundle extends Bundle

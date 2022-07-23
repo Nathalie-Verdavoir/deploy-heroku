@@ -18,7 +18,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Nat\\HerokudeployBundle\\": "src/"
+            "Nat\\DeployBundle\\": "src/"
         }
     },
     "extra": {
