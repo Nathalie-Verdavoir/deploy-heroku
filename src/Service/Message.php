@@ -2,8 +2,19 @@
 
 namespace Nat\DeployBundle\Service;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 class Message
 {
+    private $input;
+    private $output;
+    
+    public function __construct(InputInterface $input, OutputInterface $output)
+    {
+        $this->input = $input;
+        $this->output = $output;
+    }
     public function getColoredMessage(string|array $message, string $color)
     {
         $lignes = [];
