@@ -9,7 +9,7 @@
 
 // If you don't to add a custom vendor folder, then use the simple class
 // namespace HerokuDeploy;
-namespace Command;
+namespace Nat\DeployBundle\Command\Deploy;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
