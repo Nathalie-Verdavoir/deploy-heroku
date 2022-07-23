@@ -173,7 +173,7 @@ class Deploy extends Command
         $this->filesystem = new Filesystem();
         $this->processes = [];
         $this->otherVars = [];
-        $this->message = new Message();
+        $this->message = new Message($input, $output);
     }
 
     private function createHtaccess()
@@ -225,27 +225,7 @@ class Deploy extends Command
         $this->filesystem->dumpFile('Procfile', 'web: heroku-php-apache2 public/');
         $this->message->getColoredMessage('Procfile done!', 'green');
     }
-
-    private function getColoredMessage(string|array $message, string $color)
-    {
-        $lignes = [];
-        
-            $lignes[] = '';
-            $lignes[] = '<bg='. $color .'>  ============================================================================  ';
-            if( is_array($message) ) {
-                foreach($message as $mes){
-                    $separator = str_repeat(' ',71-strlen($mes));
-                    $lignes[] = '  |   ' . $mes . $separator . '|  ';
-                }
-            }else{
-                $separator = str_repeat(' ',71-strlen($message));
-                $lignes[] = '  |   ' . $message . $separator . '|  ';
-            }
-            $lignes[] = '  ======================================================================<bg=bright-magenta>by Nat</>  </>';
-            $lignes[] = '';
-        $this->output->writeln($lignes);
-    }
-
+    
     private function runProcesses($processes)
     {
         foreach($processes as $proc){
