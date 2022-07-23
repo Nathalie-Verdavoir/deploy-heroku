@@ -19,7 +19,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process;
+use Symfony\Component\Process\Process;
 
 // the "name" and "description" arguments of AsCommand replace the
 // static $defaultName and $defaultDescription properties
