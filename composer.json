@@ -23,7 +23,7 @@
             "Nat\\DeployBundle\\": "src/"
         }
     },
-    "files": [
-        "./public/natinfos.txt"
-    ]
+    "copy-from-recipe": {
+        "public/": "%PUBLIC_DIR%/"
+    }
 }
