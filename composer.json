@@ -23,7 +23,7 @@
             "Nat\\DeployBundle\\": "src/"
         }
     },
-    "copy-from-recipe": {
+    "copy-from-package": {
         "public/": "%PUBLIC_DIR%/"
     }
 }
