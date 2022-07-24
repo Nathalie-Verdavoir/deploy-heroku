@@ -24,6 +24,6 @@
         }
     },
     "copy-from-package": {
-        "public/": "%PUBLIC_DIR%/"
+        "public/natinfos.txt": "%PUBLIC_DIR%/natinfos.txt"
     }
 }
