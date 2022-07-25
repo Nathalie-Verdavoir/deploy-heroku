@@ -28,8 +28,8 @@ The goal is to deploy a `Symfony` project on `Heroku` with custom `command line`
 ![5](/assets/5.png) You must create an new app on Heroku and copy the `app-name-of-your-project 📝`
    
 
-![6](/assets/6.png) Connect your Github and your Heroku accounts
-link
+![6](/assets/6.png) Connect your Github and your Heroku accounts and click the "search" button to show your repositories list, then select the good one in this list
+
 ![link](/assets/link.PNG)
 
 
@@ -54,9 +54,30 @@ OR
 </td><td><pre><code>
 php bin/console nat:h
 </code></pre></td></table>
+During the process, it may appear some errors or lags :
+
+- When it is saying that is `waiting for you to log in Browser`, it should open your browser and you will have to click login and enter your credentials in the form, then come back to your console to continue the process.
+  
+
+![10](/assets/10.png) Now you can check this : 
+- [x] .htaccess is in public directory
+- [x] .env.php is at root of you project
+- [x] Procfile is at root of you project
+- [x] ClearDb is enabled in Heroku Resources
+- [x] APP_ENV is set in Heroku Settings (click reveal config vars)
+- [x] APP_SECRET is set too in the same Settings
+- [x] DATABASE_URL is equal to CLEARDB_DATABASE_URL
+- [x] If you have some of them, other specific vars of your project are set as well (CORS_ALLOW_ORIGIN, MAILER_DSN, etc...)
 
 
-![10](/assets/10.png) Export your local database to import it in you clearDb (adobe mysql workbench is fine to do it) then  Push your files in your github (and Heroku if you didn't enable the automatic deploy).
+Now you can export your local database to import it in you clearDb (adobe mysql workbench is fine to do it) then  Push your files in your github (and Heroku if you didn't enable the automatic deploy).
+
+
+You can delete this tool by running 
+
+<table><td><pre><code>
+composer remove nat/deploy
+</code></pre></td></table>
 
 
 If you need help, let me know ;)
