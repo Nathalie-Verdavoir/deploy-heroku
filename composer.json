@@ -22,8 +22,5 @@
         "psr-4": {
             "Nat\\DeployBundle\\": "src/"
         }
-    },
-    "copy-from-package": {
-        "public/natinfos.txt": "%PUBLIC_DIR%/natinfos.txt"
     }
 }
