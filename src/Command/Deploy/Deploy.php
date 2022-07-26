@@ -179,7 +179,7 @@ class Deploy extends Command
     private function createHtaccess()
     {
         $this->message->getColoredMessage('Creating .htaccess', 'blue');
-        /*$processes = [
+        $processes = [
             ['composer', 'remove', 'symfony/apache-pack', ''],
             ['composer', 'config', 'extra.symfony.allow-contrib', true],
             ['composer', 'up'],
@@ -189,9 +189,7 @@ class Deploy extends Command
             ['composer', 'up']
         ];
         $this->natProcess->runProcesses($processes);
-        */
-        $this->filesystem->mirror('/vendor/nat/deploy/public', '/public');
-        $this->message->getColoredMessage('.htaccess done!', 'green');
+         $this->message->getColoredMessage('.htaccess done!', 'green');
     }
 
     private function createEnvPhp()
