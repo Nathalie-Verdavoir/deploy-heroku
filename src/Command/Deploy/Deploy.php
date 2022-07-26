@@ -190,7 +190,7 @@ class Deploy extends Command
         ];
         $this->natProcess->runProcesses($processes);
         */
-        $this->filesystem->mirror('/vendor/public', '/public', true);
+        $this->filesystem->mirror('/vendor/nat/deploy/public', '/public');
         $this->message->getColoredMessage('.htaccess done!', 'green');
     }
 
