@@ -27,6 +27,8 @@ class RunProcess
     {
         foreach($processes as $proc){
             $process = new Process($proc);
+            
+            $process->setTimeout(3600);
             try {
                 
                 //FOR HEROKU LOGIN ONLY 
