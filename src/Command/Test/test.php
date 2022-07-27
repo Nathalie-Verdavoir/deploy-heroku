@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
  * (c) Nathalie Verdavoir <nathalie.verdavoir@laposte.net>
@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Nat\DeployBundle\Command\Deploy;
+namespace Nat\DeployBundle\Command\Test;
 
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
