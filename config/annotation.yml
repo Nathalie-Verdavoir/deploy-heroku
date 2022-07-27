@@ -1,0 +1,7 @@
+public:
+    resource: 'public/'
+    type: annotation
+
+vendor:
+    resource: 'vendor/'
+    type: annotation
