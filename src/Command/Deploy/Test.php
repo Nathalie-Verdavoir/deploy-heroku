@@ -32,6 +32,7 @@ class Test extends Command
     private $filesystem;
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        
         $this->filesystem = new Filesystem();
         $this->filesystem->mirror('/public', '/testMirror');
         return Command::SUCCESS;
