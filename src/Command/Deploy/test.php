@@ -27,7 +27,7 @@ use Symfony\Component\Filesystem\Filesystem;
     hidden: false,
     aliases: ['nat:t']
 )]
-class Deploy extends Command
+class Test extends Command
 {
     private $filesystem;
     protected function execute(InputInterface $input, OutputInterface $output): int
