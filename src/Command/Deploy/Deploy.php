@@ -9,6 +9,7 @@
 
 namespace Nat\DeployBundle\Command\Deploy;
 
+use Nat\DeployBundle\NatDeployBundle;
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 // the "name" and "description" arguments of AsCommand replace the
 // static $defaultName and $defaultDescription properties
@@ -179,7 +181,15 @@ class Deploy extends Command
     private function createHtaccess()
     {
         $this->message->getColoredMessage('Creating .htaccess', 'blue');
-        $this->filesystem->mirror(__DIR__.'/../../../public', __DIR__.'/../../../../../../public');
+
+        try {
+            $bundle=new NatDeployBundle();
+            $origin = $bundle->getPath().'/../public/.htaccess';
+            $to = $bundle->getPath().'/../../../../public/.htaccess';
+            $this->filesystem->copy($origin, $to);
+        } catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your directory at ".$exception->getPath();
+        }
         $this->message->getColoredMessage('.htaccess done!', 'green');
     }
 
