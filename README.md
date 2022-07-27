@@ -67,7 +67,7 @@ During the process, it may appear some errors or lags :
 - [x] APP_ENV is set in Heroku Settings (click reveal config vars)
 - [x] APP_SECRET is set too in the same Settings
 - [x] DATABASE_URL is equal to CLEARDB_DATABASE_URL
-- [x] If you have some of them, other specific vars of your project are set as well (CORS_ALLOW_ORIGIN, MAILER_DSN, etc...). If they are not, please set them by yourself. 
+- [x] If you have some of them, other specific vars of your project are set as well (CORS_ALLOW_ORIGIN, MAILER_DSN, etc...). If they are not set, please set them by yourself. 
 
 
 Now you can export your local database to import it in you clearDb (adobe mysql workbench is fine to do it) then  Push your files in your github (and Heroku if you didn't enable the automatic deploy).
