@@ -10,6 +10,7 @@
 namespace Nat\DeployBundle\Command\Deploy;
 
 use Nat\DeployBundle\NatDeployBundle;
+use Nat\DeployBundle\Service\CreateEnvPhp;
 use Nat\DeployBundle\Service\CreateHtaccess;
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
@@ -55,7 +56,7 @@ class Deploy extends Command
 
         $this->io->progressAdvance(10);
 
-        new CreateHtaccess($input, $output, $this->io);
+        new CreateEnvPhp($input, $output, $this->io);
 
         $this->io->progressAdvance(10);
 

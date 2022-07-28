@@ -2,7 +2,6 @@
 
 namespace Nat\DeployBundle\Service;
 
-use Nat\DeployBundle\NatDeployBundle;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -10,12 +9,13 @@ class CreateEnvPhp
 {
     public function __construct($input, $output, $io)
     { 
-        $this->message->getColoredMessage('Creating .env.php file', 'blue');
+        $message = Message::getInstance($input, $output);
+        $message->getColoredMessage('Creating .env.php file', 'blue');
         $processes = [
             ['composer', 'dump-env', 'prod'],
         ];
         RunProcess::getInstance($input, $output, $io)->runProcesses($processes);
-        $filesystem= new Filesystem();
+        $filesystem = new Filesystem();
         try {
             $filesystem->copy('.env.local.php', '.env.php');
         } catch (IOExceptionInterface $exception) {
@@ -32,5 +32,6 @@ class CreateEnvPhp
         } catch (IOExceptionInterface $exception) {
             echo "An error occurred while dumping your file at ".$exception->getPath();
         }
+        $message->getColoredMessage('.env.php done!', 'green');
     }
 }
