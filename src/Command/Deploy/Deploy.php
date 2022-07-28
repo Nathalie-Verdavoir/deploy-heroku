@@ -256,7 +256,8 @@ class Deploy extends Command
         foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $envVar) {
             if ($envVar !== 'DATABASE_URL') {
                 $this->message->getColoredMessage(['Setting ' . $envVar . ' in Heroku'], 'blue');
-                $processes[] = ['heroku', 'config:set', $envVar . '=' . $_SERVER[$envVar], '--app=' . $this->herokuAppName];
+                $value = $envVar . '=' . $_SERVER[$envVar];
+                $processes[] = ['heroku', 'config:set', $value, '--app=' . $this->herokuAppName];
                 $this->message->getColoredMessage([$envVar . ' set in Heroku'], 'green');
             }
         }
