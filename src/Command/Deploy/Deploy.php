@@ -10,6 +10,7 @@
 namespace Nat\DeployBundle\Command\Deploy;
 
 use Nat\DeployBundle\NatDeployBundle;
+use Nat\DeployBundle\Service\CreateHtaccess;
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -50,7 +51,7 @@ class Deploy extends Command
     {
         $this->io->progressStart(100);
 
-        $this->createHtaccess();
+        new CreateHtaccess($input, $output);
 
         $this->io->progressAdvance(10);
 
@@ -176,21 +177,6 @@ class Deploy extends Command
         $this->otherVars = [];
         $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
         $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
-    }
-
-    private function createHtaccess()
-    {
-        $this->message->getColoredMessage('Creating .htaccess', 'blue');
-
-        try {
-            $bundle=new NatDeployBundle();
-            $origin = $bundle->getPath().'/../public/.htaccess';
-            $to = $bundle->getPath().'/../../../../public/.htaccess';
-            $this->filesystem->copy($origin, $to);
-        } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your file at ".$exception->getPath();
-        }
-        $this->message->getColoredMessage('.htaccess done!', 'green');
     }
 
     private function createEnvPhp()
