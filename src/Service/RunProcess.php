@@ -31,14 +31,16 @@ class RunProcess
         $this->input = $input;
         $this->output = $output;
         $this->io = $io;
-        $this->message = new Message($this->input, $this->output);
+        $this->message = Message::getInstance($this->input, $this->output);
     }
 
     public function runProcesses($processes, array $paramsProc = [])
     {
         foreach ($processes as $proc) {
             $process = new Process($proc);
-
+            if ($proc[1] === 'config:set') {
+                $this->message->getColoredMessage(['Setting ' . $proc[2] . ' in Heroku'], 'blue');
+            }
             $process->setTimeout(3600);
             try {
 
@@ -59,7 +61,9 @@ class RunProcess
                     }
                     return $process->getOutput();
                 }
-
+                if ($proc[1] === 'config:set') {
+                    $this->message->getColoredMessage([$proc[2] . ' set in Heroku'], 'green');
+                }
                 echo $process->getOutput();
             } catch (ProcessFailedException $exception) {
                 echo $exception->getMessage();

@@ -14,6 +14,7 @@ use Nat\DeployBundle\Service\CreateHtaccess;
 use Nat\DeployBundle\Service\CreateProcfile;
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
+use Nat\DeployBundle\Service\SetOtherVars;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,13 +70,9 @@ class Deploy extends Command
             $this->setClearDbAddon();
         }
 
-        $this->io->progressAdvance();
+        $this->io->progressAdvance(5);
 
-
-        $this->io->progressAdvance();
-
-        $this->setOtherVars();
-
+        new SetOtherVars($input, $output, $this->io, $this->herokuAppName);
 
         $this->io->progressFinish(100);
 
@@ -214,19 +211,5 @@ class Deploy extends Command
         $text = trim(preg_replace('/\s+/', ' ', $text));
         $text = preg_replace("/(\r\n|\n|\r|\t)/i", '', $text);
         return $text;
-    }
-
-    private function setOtherVars()
-    {
-        $processes = [];
-        foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $envVar) {
-            if ($envVar !== 'DATABASE_URL') {
-                $this->message->getColoredMessage(['Setting ' . $envVar . ' in Heroku'], 'blue');
-                $value = $envVar . '=' . $_SERVER[$envVar];
-                $processes[] = ['heroku', 'config:set', $value, '--app=' . $this->herokuAppName];
-                $this->message->getColoredMessage([$envVar . ' set in Heroku'], 'green');
-            }
-        }
-        $this->natProcess->runProcesses($processes);
     }
 }
