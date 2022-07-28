@@ -55,7 +55,7 @@ class Deploy extends Command
 
         $this->io->progressAdvance(10);
 
-        $this->createEnvPhp();
+        new CreateHtaccess($input, $output, $this->io);
 
         $this->io->progressAdvance(10);
 
@@ -178,7 +178,7 @@ class Deploy extends Command
         $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
         $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
     }
-
+/*
     private function createEnvPhp()
     {
         $this->message->getColoredMessage('Creating .env.php file', 'blue');
@@ -209,7 +209,7 @@ class Deploy extends Command
        } 
         $this->message->getColoredMessage('.env.php done!', 'green');
     }
-
+*/
     private function createProcfile()
     {
         $this->message->getColoredMessage('Creating Procfile', 'blue'); 

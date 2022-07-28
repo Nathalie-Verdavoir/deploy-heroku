@@ -14,6 +14,17 @@ class RunProcess
     private $input;
     private $output;
     private $message;
+    private static $_instance;
+
+    //to call the unique instance of this class form anywhere else you have to use : RunProcess::getInstance();
+
+    public static function getInstance(InputInterface $input, OutputInterface $output, SymfonyStyle $io)
+    {
+        if (is_null(self::$_instance)) {
+            return self::$_instance = new RunProcess($input, $output, $io);
+        }
+        return self::$_instance;
+    }
 
     public function __construct(InputInterface $input, OutputInterface $output, SymfonyStyle $io)
     {
