@@ -174,7 +174,7 @@ class Deploy extends Command
         $this->filesystem = new Filesystem();
         $this->processes = [];
         $this->otherVars = [];
-        $this->message = new Message($this->input, $this->output);
+        $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
         $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
     }
 
@@ -188,7 +188,7 @@ class Deploy extends Command
             $to = $bundle->getPath().'/../../../../public/.htaccess';
             $this->filesystem->copy($origin, $to);
         } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your directory at ".$exception->getPath();
+            echo "An error occurred while creating your file at ".$exception->getPath();
         }
         $this->message->getColoredMessage('.htaccess done!', 'green');
     }
@@ -200,6 +200,7 @@ class Deploy extends Command
             ['composer', 'dump-env', 'prod'],
         ];
         $this->natProcess->runProcesses($processes);
+        try {
         $this->filesystem->copy('.env.local.php', '.env.php');
         $this->filesystem->dumpFile('.env.php', "<?php
 
@@ -207,6 +208,9 @@ class Deploy extends Command
           'APP_ENV' => 'prod',
         );
         ");
+        } catch (IOExceptionInterface $exception) {
+            echo "An error occurred while creating your file at ".$exception->getPath();
+        }
         foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $parm) {
             $this->output->writeln([$parm. '='.$_SERVER[$parm]]);
             if($parm=='DATABASE_URL') {
