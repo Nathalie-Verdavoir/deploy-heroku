@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
  * (c) Nathalie Verdavoir <nathalie.verdavoir@laposte.net>
@@ -12,6 +12,7 @@ namespace Nat\DeployBundle\Command\Deploy;
 use Nat\DeployBundle\NatDeployBundle;
 use Nat\DeployBundle\Service\CreateEnvPhp;
 use Nat\DeployBundle\Service\CreateHtaccess;
+use Nat\DeployBundle\Service\CreateProcfile;
 use Nat\DeployBundle\Service\Message;
 use Nat\DeployBundle\Service\RunProcess;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -20,8 +21,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 // the "name" and "description" arguments of AsCommand replace the
 // static $defaultName and $defaultDescription properties
@@ -34,7 +33,6 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Deploy extends Command
 {
     private $io;
-    private $filesystem;
     private $input;
     private $output;
     private $appSecret;
@@ -60,42 +58,36 @@ class Deploy extends Command
 
         $this->io->progressAdvance(10);
 
-        $this->createProcfile();
+        new CreateProcfile($input, $output);
 
         $this->io->progressAdvance(10);
 
         $this->checkForHerokuLogin();
 
         $this->io->progressAdvance(10);
-        
-        $this->setAppEnvProd();
 
         $this->io->progressAdvance(5);
 
-        if( $this->databaseNeeded == 'yes' ){
+        if ($this->databaseNeeded == 'yes') {
             $this->setClearDbAddon();
         }
 
         $this->io->progressAdvance();
 
-        if( $this->appSecret ){
-            $this->setAppSecret();
-        }
 
         $this->io->progressAdvance();
 
-        if(count($this->otherVars)>0){
-            $this->setOtherVars();
-        }
+        $this->setOtherVars();
+
 
         $this->io->progressFinish(100);
 
         $this->message->getColoredMessage('WOAH ! It seems that everything is done ! Enjoy !', 'green');
-    
+
         return Command::SUCCESS;
     }
 
-/**
+    /**
      * Interacts with the user.
      *
      * This method is executed before the InputDefinition is validated.
@@ -104,29 +96,32 @@ class Deploy extends Command
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $this->message->getColoredMessage([
-            'Hello, I am tool to deploy your symfony project on Heroku',
-            'developed by Nathalie Verdavoir nathalie.verdavoir@laposte.net',
-            ], 
+        $this->message->getColoredMessage(
+            [
+                'Hello, I am tool to deploy your symfony project on Heroku',
+                'developed by Nathalie Verdavoir nathalie.verdavoir@laposte.net',
+            ],
             'blue'
         );
-        $this->message->getColoredMessage([
-            'I will help you step by step',
-            '1-You must have an Heroku account'
-            ], 
+        $this->message->getColoredMessage(
+            [
+                'I will help you step by step',
+                '1-You must have an Heroku account'
+            ],
             'cyan'
         );
-        $this->message->getColoredMessage([
-            'If you need a DATABASE (mySql/MariaDb) for your app',
-            '2-You must have a credit card associated with your Heroku account',
-            '(don\'t worry it is totally FREE if you keep default settings)',
-            'https://dashboard.heroku.com/account/billing'
-            ], 
+        $this->message->getColoredMessage(
+            [
+                'If you need a DATABASE (mySql/MariaDb) for your app',
+                '2-You must have a credit card associated with your Heroku account',
+                '(don\'t worry it is totally FREE if you keep default settings)',
+                'https://dashboard.heroku.com/account/billing'
+            ],
             'cyan'
         );
 
-        
-        $this->herokuUser = $this->io->ask('What is your Username to log in Heroku Account? (your.email@example.com)', '',function ($username) {
+
+        $this->herokuUser = $this->io->ask('What is your Username to log in Heroku Account? (your.email@example.com)', '', function ($username) {
             if (empty($username)) {
                 throw new \RuntimeException('Username (email) cannot be empty.');
             }
@@ -139,7 +134,7 @@ class Deploy extends Command
             return $apiKey;
         });
 
-        $this->herokuAppName = $this->io->ask('What is the name of your app? (app-example-name)', '',function ($appName) {
+        $this->herokuAppName = $this->io->ask('What is the name of your app? (app-example-name)', '', function ($appName) {
             if (empty($appName)) {
                 throw new \RuntimeException('AppName cannot be empty.');
             }
@@ -153,12 +148,11 @@ class Deploy extends Command
             0
         );
         $this->databaseNeeded = $helper->ask($input, $output, $question);
-        $output->writeln('You have just selected: '.$this->databaseNeeded);
-        
+        $output->writeln('You have just selected: ' . $this->databaseNeeded);
     }
 
 
-/**
+    /**
      * Initializes the command after the input has been bound and before the input
      * is validated.
      *
@@ -173,54 +167,25 @@ class Deploy extends Command
         $this->input = $input;
         $this->output = $output;
         $this->io = new SymfonyStyle($this->input, $this->output);
-        $this->filesystem = new Filesystem();
         $this->processes = [];
         $this->otherVars = [];
         $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
         $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
     }
-/*
-    private function createEnvPhp()
-    {
-        $this->message->getColoredMessage('Creating .env.php file', 'blue');
-        $processes = [
-            ['composer', 'dump-env', 'prod'],
-        ];
-        $this->natProcess->runProcesses($processes);
-        try {
-        $this->filesystem->copy('.env.local.php', '.env.php');
-        $this->filesystem->dumpFile('.env.php', "<?php
+    /*
 
-        return array (
-          'APP_ENV' => 'prod',
-        );
-        ");
-        } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your file at ".$exception->getPath();
-        }
         foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $parm) {
             $this->output->writeln([$parm. '='.$_SERVER[$parm]]);
             if($parm=='DATABASE_URL') {
                 $this->databaseUrl =  $_SERVER[$parm];
-            }else if($parm=='APP_SECRET') {
-                $this->appSecret = $_SERVER[$parm];
             }else{
                 $this->otherVars[] = $parm;
             }
-       } 
-        $this->message->getColoredMessage('.env.php done!', 'green');
-    }
+   
 */
-    private function createProcfile()
-    {
-        $this->message->getColoredMessage('Creating Procfile', 'blue'); 
-        $this->filesystem->dumpFile('Procfile', 'web: heroku-php-apache2 public/');
-        $this->message->getColoredMessage('Procfile done!', 'green');
-    }
-
     private function checkForHerokuLogin()
     {
-        $this->message->getColoredMessage(['Login to Heroku','Waiting for you to log in browser'], 'blue');
+        $this->message->getColoredMessage(['Login to Heroku', 'Waiting for you to log in browser'], 'blue');
         $processes = [
             ['heroku', 'authorizations:create'],
             ['heroku', 'auth:whoami'],
@@ -230,7 +195,7 @@ class Deploy extends Command
         $this->message->getColoredMessage('Logged in !', 'green');
     }
 
-    private function setAppEnvProd()
+    /*   private function setAppEnvProd()
     {
         $this->message->getColoredMessage(['Setting APP_ENV in Heroku'], 'blue');
         $processes = [
@@ -238,31 +203,31 @@ class Deploy extends Command
         ];
         $this->natProcess->runProcesses($processes);
         $this->message->getColoredMessage(['APP_ENV set'], 'green');
-    }
+    } */
 
     private function setClearDbAddon()
     {
         $this->message->getColoredMessage(['Add ClearDb and setting APP_ENV in Heroku'], 'blue');
         $processes = [
-            ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app='.$this->herokuAppName]
+            ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app=' . $this->herokuAppName]
         ];
         $clearDB = $this->natProcess->runProcesses($processes);
-        if(!str_contains($clearDB, 'm')){ // no database yet so it needs one
+        if (!str_contains($clearDB, 'm')) { // no database yet so it needs one
             $processes = [
-                ['heroku', 'addons:create', 'cleardb:ignite', '--app='.$this->herokuAppName],
+                ['heroku', 'addons:create', 'cleardb:ignite', '--app=' . $this->herokuAppName],
                 ['heroku', 'config|grep', 'CLEARDB_DATABASE_URL'],
             ];
-            $this->natProcess->runProcesses($processes); 
+            $this->natProcess->runProcesses($processes);
             $processes = [
-                ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app='.$this->herokuAppName]
+                ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app=' . $this->herokuAppName]
             ];
             $clearDB = $this->natProcess->runProcesses($processes);
         }
         $this->message->getColoredMessage(['Copying CLEARDB_DATABASE_URL to DATABASE_URL in Heroku'], 'blue');
-        $databasevar = 'DATABASE_URL='. $this->clean($clearDB);
+        $databasevar = 'DATABASE_URL=' . $this->clean($clearDB);
 
         $processes = [
-            ['heroku', 'config:set', $databasevar, '--app='.$this->herokuAppName]
+            ['heroku', 'config:set', $databasevar, '--app=' . $this->herokuAppName]
         ];
         $this->natProcess->runProcesses($processes);
         $this->message->getColoredMessage(['ClearDb added and DATABASE_URL set'], 'green');
@@ -270,12 +235,12 @@ class Deploy extends Command
 
     private function clean($text)
     {
-        $text = trim( preg_replace( '/\s+/', ' ', $text ) );  
+        $text = trim(preg_replace('/\s+/', ' ', $text));
         $text = preg_replace("/(\r\n|\n|\r|\t)/i", '', $text);
         return $text;
     }
 
-    private function setAppSecret()
+    /* private function setAppSecret()
     {
         $this->message->getColoredMessage(['Setting APP_SECRET in Heroku'], 'blue');
         $processes = [
@@ -283,15 +248,17 @@ class Deploy extends Command
         ];
         $this->natProcess->runProcesses($processes);
         $this->message->getColoredMessage(['APP_SECRET set in Heroku'], 'green');
-    }
+    } */
 
     private function setOtherVars()
     {
         $processes = [];
-        foreach($this->otherVars as $envVar){
-            $this->message->getColoredMessage(['Setting '. $envVar. ' in Heroku'], 'blue');
-            $processes[] = ['heroku', 'config:set', $envVar . '=' . $_SERVER[$envVar], '--app='.$this->herokuAppName];
-            $this->message->getColoredMessage([$envVar. ' set in Heroku'], 'green');
+        foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $envVar) {
+            if ($envVar !== 'DATABASE_URL') {
+                $this->message->getColoredMessage(['Setting ' . $envVar . ' in Heroku'], 'blue');
+                $processes[] = ['heroku', 'config:set', $envVar . '=' . $_SERVER[$envVar], '--app=' . $this->herokuAppName];
+                $this->message->getColoredMessage([$envVar . ' set in Heroku'], 'green');
+            }
         }
     }
 }

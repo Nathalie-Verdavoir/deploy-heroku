@@ -34,8 +34,6 @@ class Test extends Command
  
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        
-     
         echo 'test';
     
         return Command::SUCCESS;
