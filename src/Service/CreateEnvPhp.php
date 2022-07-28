@@ -8,7 +8,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class CreateEnvPhp
 {
     public function __construct($input, $output, $io)
-    { 
+    {
         $message = Message::getInstance($input, $output);
         $message->getColoredMessage('Creating .env.php file', 'blue');
         $processes = [
@@ -19,7 +19,7 @@ class CreateEnvPhp
         try {
             $filesystem->copy('.env.local.php', '.env.php');
         } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating your file at ".$exception->getPath();
+            echo "An error occurred while creating your file at " . $exception->getPath();
         }
 
         try {
@@ -30,7 +30,7 @@ class CreateEnvPhp
         );
         ");
         } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while dumping your file at ".$exception->getPath();
+            echo "An error occurred while dumping your file at " . $exception->getPath();
         }
         $message->getColoredMessage('.env.php done!', 'green');
     }

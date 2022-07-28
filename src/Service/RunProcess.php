@@ -33,28 +33,28 @@ class RunProcess
         $this->io = $io;
         $this->message = new Message($this->input, $this->output);
     }
-    
+
     public function runProcesses($processes, array $paramsProc = [])
     {
-        foreach($processes as $proc){
+        foreach ($processes as $proc) {
             $process = new Process($proc);
-            
+
             $process->setTimeout(3600);
             try {
-                
+
                 //FOR HEROKU LOGIN ONLY 
-                if($proc[1]=="authorizations:create") {
+                if ($proc[1] == "authorizations:create") {
                     $process->setInput($herokuUser = $paramsProc[0], $herokuApiKey = $paramsProc[1]);
                 }
 
                 $process->mustRun();
                 $this->getProcessMessages($proc);
-                
+
                 //FOR CLEARDB_DATABASE_URL ONLY 
-                if($proc[1]==='config:get' && $proc[2]==='CLEARDB_DATABASE_URL') {     
-                   if(!str_contains($process->getOutput(), 'm')){
+                if ($proc[1] === 'config:get' && $proc[2] === 'CLEARDB_DATABASE_URL') {
+                    if (!str_contains($process->getOutput(), 'm')) {
                         echo 'Adding a new ClearDb database...';
-                    }else{
+                    } else {
                         echo 'Your CLEARDB database url : ' . $process->getOutput();
                     }
                     return $process->getOutput();
@@ -65,10 +65,10 @@ class RunProcess
                 echo $exception->getMessage();
 
                 //FOR HEROKU AUTH FAILED ONLY
-                if($proc[1]=="authorizations:create") {
+                if ($proc[1] == "authorizations:create") {
                     $this->message->getColoredMessage(['Please run \'heroku login -i\' command'], 'red');
                 }
-            } 
+            }
         }
     }
 
@@ -76,11 +76,12 @@ class RunProcess
     {
         //echo  '$this->output';
         $this->output->writeln(
-            [ '<info>' . implode(' ',$proc) . '</>',
-            '']
+            [
+                '<info>' . implode(' ', $proc) . '</>',
+                ''
+            ]
         );
         $this->io->progressAdvance(2);
         $this->output->writeln(['']);
     }
-
 }

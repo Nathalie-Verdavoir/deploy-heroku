@@ -9,7 +9,6 @@
 
 namespace Nat\DeployBundle\Command\Deploy;
 
-use Nat\DeployBundle\NatDeployBundle;
 use Nat\DeployBundle\Service\CreateEnvPhp;
 use Nat\DeployBundle\Service\CreateHtaccess;
 use Nat\DeployBundle\Service\CreateProcfile;
@@ -35,8 +34,6 @@ class Deploy extends Command
     private $io;
     private $input;
     private $output;
-    private $appSecret;
-    private $otherVars;
     private $message;
 
     //need form
@@ -144,8 +141,8 @@ class Deploy extends Command
         $question = new ChoiceQuestion(
             'Do you need a ClearDb/mySql addon (set to free, ignite plan)?',
             // choices can also be PHP objects that implement __toString() method
-            ['yes', 'no'],
-            0
+            ['no', 'yes'],
+            1
         );
         $this->databaseNeeded = $helper->ask($input, $output, $question);
         $output->writeln('You have just selected: ' . $this->databaseNeeded);
@@ -168,21 +165,10 @@ class Deploy extends Command
         $this->output = $output;
         $this->io = new SymfonyStyle($this->input, $this->output);
         $this->processes = [];
-        $this->otherVars = [];
         $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
         $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
     }
-    /*
 
-        foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS']) as $parm) {
-            $this->output->writeln([$parm. '='.$_SERVER[$parm]]);
-            if($parm=='DATABASE_URL') {
-                $this->databaseUrl =  $_SERVER[$parm];
-            }else{
-                $this->otherVars[] = $parm;
-            }
-   
-*/
     private function checkForHerokuLogin()
     {
         $this->message->getColoredMessage(['Login to Heroku', 'Waiting for you to log in browser'], 'blue');
@@ -194,16 +180,6 @@ class Deploy extends Command
         $this->natProcess->runProcesses($processes, $paramsProc);
         $this->message->getColoredMessage('Logged in !', 'green');
     }
-
-    /*   private function setAppEnvProd()
-    {
-        $this->message->getColoredMessage(['Setting APP_ENV in Heroku'], 'blue');
-        $processes = [
-            ['heroku', 'config:set', 'APP_ENV=prod', '--app='.$this->herokuAppName]
-        ];
-        $this->natProcess->runProcesses($processes);
-        $this->message->getColoredMessage(['APP_ENV set'], 'green');
-    } */
 
     private function setClearDbAddon()
     {
@@ -240,16 +216,6 @@ class Deploy extends Command
         return $text;
     }
 
-    /* private function setAppSecret()
-    {
-        $this->message->getColoredMessage(['Setting APP_SECRET in Heroku'], 'blue');
-        $processes = [
-            ['heroku', 'config:set', 'APP_SECRET='.$this->appSecret, '--app='.$this->herokuAppName],
-        ];
-        $this->natProcess->runProcesses($processes);
-        $this->message->getColoredMessage(['APP_SECRET set in Heroku'], 'green');
-    } */
-
     private function setOtherVars()
     {
         $processes = [];
@@ -261,5 +227,6 @@ class Deploy extends Command
                 $this->message->getColoredMessage([$envVar . ' set in Heroku'], 'green');
             }
         }
+        $this->natProcess->runProcesses($processes);
     }
 }
