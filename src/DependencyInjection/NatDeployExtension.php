@@ -19,7 +19,6 @@ class NatDeployExtension extends Extension
             new FileLocator(__DIR__.'/../../config')
         );
         $loader->load('services.yml');
-        Message::getInstance(new InputInterface, new OutputInterface) // get the unique isntance of message
-            ->getColoredMessage('Thanks for using Nat/Deploy ;)');
+        echo 'Thanks for installing nat/deploy';
     }
 }
