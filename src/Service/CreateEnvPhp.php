@@ -2,10 +2,11 @@
 
 namespace Nat\DeployBundle\Service;
 
+use Nat\DeployBundle\NatDeployBundle;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class CreateHtaccess
+class CreateEnvPhp
 {
     public function __construct($input, $output, $io)
     { 
