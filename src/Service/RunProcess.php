@@ -2,9 +2,6 @@
 
 namespace Nat\DeployBundle\Service;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -18,20 +15,21 @@ class RunProcess
 
     //to call the unique instance of this class form anywhere else you have to use : RunProcess::getInstance();
 
-    public static function getInstance(InputInterface $input, OutputInterface $output, SymfonyStyle $io)
+    public static function getInstance()
     {
         if (is_null(self::$_instance)) {
-            return self::$_instance = new RunProcess($input, $output, $io);
+            return self::$_instance = new RunProcess();
         }
         return self::$_instance;
     }
 
-    public function __construct(InputInterface $input, OutputInterface $output, SymfonyStyle $io)
+    public function __construct()
     {
-        $this->input = $input;
-        $this->output = $output;
-        $this->io = $io;
-        $this->message = Message::getInstance($this->input, $this->output);
+        $infos = NatInfos::getInstance();
+        $this->input = $infos->input;
+        $this->output = $infos->output;
+        $this->io = $infos->io;
+        $this->message = Message::getInstance();
     }
 
     public function runProcesses($processes, array $paramsProc = [])
@@ -39,14 +37,14 @@ class RunProcess
         foreach ($processes as $proc) {
             $process = new Process($proc);
             if ($proc[1] === 'config:set') {
-                $this->message->getColoredMessage(['Setting ' . $proc[2] . ' in Heroku'], 'blue');
+                $this->message->getColoredMessage(['Setting ' . substr($proc[2], 0, strpos($proc[2], '=')) . ' in Heroku'], 'blue');
             }
             $process->setTimeout(3600);
             try {
 
                 //FOR HEROKU LOGIN ONLY 
                 if ($proc[1] == "authorizations:create") {
-                    $process->setInput($herokuUser = $paramsProc[0], $herokuApiKey = $paramsProc[1]);
+                    $process->setInput($paramsProc[0], $paramsProc[1]);
                 }
 
                 $process->mustRun();
@@ -62,7 +60,8 @@ class RunProcess
                     return $process->getOutput();
                 }
                 if ($proc[1] === 'config:set') {
-                    $this->message->getColoredMessage([$proc[2] . ' set in Heroku'], 'green');
+                    $this->message->getColoredMessage([substr($proc[2], 0, strpos($proc[2], '=')) . ' set in Heroku'], 'green');
+                    $this->io->progressAdvance(5);
                 }
                 echo $process->getOutput();
             } catch (ProcessFailedException $exception) {
@@ -78,7 +77,6 @@ class RunProcess
 
     private function getProcessMessages(array $proc)
     {
-        //echo  '$this->output';
         $this->output->writeln(
             [
                 '<info>' . implode(' ', $proc) . '</>',

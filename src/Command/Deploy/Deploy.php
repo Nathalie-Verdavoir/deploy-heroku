@@ -9,11 +9,15 @@
 
 namespace Nat\DeployBundle\Command\Deploy;
 
+use Nat\DeployBundle\Service\AddClearDB;
+use Nat\DeployBundle\Service\CheckForHerokuLogin;
 use Nat\DeployBundle\Service\CreateEnvPhp;
 use Nat\DeployBundle\Service\CreateHtaccess;
 use Nat\DeployBundle\Service\CreateProcfile;
 use Nat\DeployBundle\Service\Message;
+use Nat\DeployBundle\Service\NatInfos;
 use Nat\DeployBundle\Service\RunProcess;
+use Nat\DeployBundle\Service\SetClearDbAddon;
 use Nat\DeployBundle\Service\SetOtherVars;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -32,51 +36,45 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class Deploy extends Command
 {
-    private $io;
-    private $input;
-    private $output;
     private $message;
-
-    //need form
-    private $herokuUser;
-    private $herokuApiKey;
-    private $herokuAppName;
-    private $databaseNeeded;
-
+    private $infos;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io->progressStart(100);
+        $this->infos->io->progressStart(100);
 
-        new CreateHtaccess($input, $output);
+        new CreateHtaccess();
 
-        $this->io->progressAdvance(10);
+        new CreateEnvPhp();
 
-        new CreateEnvPhp($input, $output, $this->io);
+        new CreateProcfile();
 
-        $this->io->progressAdvance(10);
+        new CheckForHerokuLogin();
 
-        new CreateProcfile($input, $output);
-
-        $this->io->progressAdvance(10);
-
-        $this->checkForHerokuLogin();
-
-        $this->io->progressAdvance(10);
-
-        $this->io->progressAdvance(5);
-
-        if ($this->databaseNeeded == 'yes') {
-            $this->setClearDbAddon();
+        if ($this->infos->databaseNeeded == 'yes') {
+            new AddClearDB();
+            new SetClearDbAddon();
         }
 
-        $this->io->progressAdvance(5);
+        $this->infos->io->progressAdvance(5);
 
-        new SetOtherVars($input, $output, $this->io, $this->herokuAppName);
+        new SetOtherVars();
 
-        $this->io->progressFinish(100);
+        $this->infos->io->progressFinish(100);
 
-        $this->message->getColoredMessage('WOAH ! It seems that everything is done ! Enjoy !', 'green');
+        $this->message->getColoredMessage([
+            'WOAH ! It seems that everything is done ! Enjoy !',
+            'Please check the whole list :',
+            '- [x] .htaccess is in public directory',
+            '- [x] .env.php is at root of you project',
+            '- [x] Procfile is at root as well',
+            '- [x] ClearDb is enabled in Heroku Resources',
+            '- [x] All of the vars are set in Heroku Settings (reveal config vars)',
+            'Now you can export your local database to import it in you clearDb',
+            '(adobe mysql workbench is fine to do it)',
+            'Push your files on your github (and on Heroku if you need and deploy).',
+            'Everything is ok ? You can remove me : "composer remove nat/deploy"'
+        ], 'green');
 
         return Command::SUCCESS;
     }
@@ -115,20 +113,20 @@ class Deploy extends Command
         );
 
 
-        $this->herokuUser = $this->io->ask('What is your Username to log in Heroku Account? (your.email@example.com)', '', function ($username) {
+        $this->infos->herokuUser = $this->infos->io->ask('What is your Username to log in Heroku Account? (your.email@example.com)', '', function ($username) {
             if (empty($username)) {
                 throw new \RuntimeException('Username (email) cannot be empty.');
             }
             return $username;
         });
-        $this->herokuApiKey = $this->io->ask('What is your ApiKey in Heroku Account?', '', function ($apiKey) {
+        $this->infos->herokuApiKey = $this->infos->io->ask('What is your ApiKey in Heroku Account?', '', function ($apiKey) {
             if (empty($apiKey)) {
                 throw new \RuntimeException('Password cannot be empty.');
             }
             return $apiKey;
         });
 
-        $this->herokuAppName = $this->io->ask('What is the name of your app? (app-example-name)', '', function ($appName) {
+        $this->infos->herokuAppName = $this->infos->io->ask('What is the name of your app? (app-example-name)', '', function ($appName) {
             if (empty($appName)) {
                 throw new \RuntimeException('AppName cannot be empty.');
             }
@@ -141,8 +139,8 @@ class Deploy extends Command
             ['no', 'yes'],
             1
         );
-        $this->databaseNeeded = $helper->ask($input, $output, $question);
-        $output->writeln('You have just selected: ' . $this->databaseNeeded);
+        $this->infos->databaseNeeded = $helper->ask($input, $output, $question);
+        $output->writeln('You have just selected: ' . $this->infos->databaseNeeded);
     }
 
 
@@ -158,58 +156,13 @@ class Deploy extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
-        $this->output = $output;
-        $this->io = new SymfonyStyle($this->input, $this->output);
+        $this->infos = NatInfos::getInstance();
+        $this->infos->input = $input;
+        $this->infos->output = $output;
+        NatInfos::getInstance()->io =  new SymfonyStyle($input, $output);
+        $this->infos->io = NatInfos::getInstance()->io;
         $this->processes = [];
-        $this->message = Message::getInstance($this->input, $this->output); //call the unique Message instance (singleton)
-        $this->natProcess = new RunProcess($this->input, $this->output, $this->io);
-    }
-
-    private function checkForHerokuLogin()
-    {
-        $this->message->getColoredMessage(['Login to Heroku', 'Waiting for you to log in browser'], 'blue');
-        $processes = [
-            ['heroku', 'authorizations:create'],
-            ['heroku', 'auth:whoami'],
-        ];
-        $paramsProc = [$this->herokuUser, $this->herokuApiKey];
-        $this->natProcess->runProcesses($processes, $paramsProc);
-        $this->message->getColoredMessage('Logged in !', 'green');
-    }
-
-    private function setClearDbAddon()
-    {
-        $this->message->getColoredMessage(['Add ClearDb and setting APP_ENV in Heroku'], 'blue');
-        $processes = [
-            ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app=' . $this->herokuAppName]
-        ];
-        $clearDB = $this->natProcess->runProcesses($processes);
-        if (!str_contains($clearDB, 'm')) { // no database yet so it needs one
-            $processes = [
-                ['heroku', 'addons:create', 'cleardb:ignite', '--app=' . $this->herokuAppName],
-                ['heroku', 'config|grep', 'CLEARDB_DATABASE_URL'],
-            ];
-            $this->natProcess->runProcesses($processes);
-            $processes = [
-                ['heroku', 'config:get', 'CLEARDB_DATABASE_URL', '--app=' . $this->herokuAppName]
-            ];
-            $clearDB = $this->natProcess->runProcesses($processes);
-        }
-        $this->message->getColoredMessage(['Copying CLEARDB_DATABASE_URL to DATABASE_URL in Heroku'], 'blue');
-        $databasevar = 'DATABASE_URL=' . $this->clean($clearDB);
-
-        $processes = [
-            ['heroku', 'config:set', $databasevar, '--app=' . $this->herokuAppName]
-        ];
-        $this->natProcess->runProcesses($processes);
-        $this->message->getColoredMessage(['ClearDb added and DATABASE_URL set'], 'green');
-    }
-
-    private function clean($text)
-    {
-        $text = trim(preg_replace('/\s+/', ' ', $text));
-        $text = preg_replace("/(\r\n|\n|\r|\t)/i", '', $text);
-        return $text;
+        $this->message = Message::getInstance(); //call the unique Message instance (singleton)
+        $this->infos->natProcess = new RunProcess();
     }
 }

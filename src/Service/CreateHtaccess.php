@@ -8,12 +8,12 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class CreateHtaccess
 {
-    public function __construct($input, $output)
+    public function __construct()
     {
         $bundle = NatDeployBundle::getInstance();
         $origin = $bundle->getDir() . '/public/.htaccess';
         $to = $bundle->getDir() . '/../../../public/.htaccess';
-        $message = Message::getInstance($input, $output);
+        $message = Message::getInstance();
         $message->getColoredMessage('Creating .htaccess', 'blue');
         $filesystem = new Filesystem();
         try {
@@ -21,6 +21,7 @@ class CreateHtaccess
         } catch (IOExceptionInterface $exception) {
             echo "An error occurred while creating your file at " . $exception->getPath();
         }
-        $message->getColoredMessage('.htaccess done!', 'green');
+        
+        $message->getColoredMessage('.htaccess done!', 'green');NatInfos::getInstance()->io->progressAdvance(10);
     }
 }

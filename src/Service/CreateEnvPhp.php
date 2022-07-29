@@ -7,14 +7,14 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class CreateEnvPhp
 {
-    public function __construct($input, $output, $io)
+    public function __construct()
     {
-        $message = Message::getInstance($input, $output);
+        $message = Message::getInstance();
         $message->getColoredMessage('Creating .env.php file', 'blue');
         $processes = [
             ['composer', 'dump-env', 'prod'],
         ];
-        RunProcess::getInstance($input, $output, $io)->runProcesses($processes);
+        RunProcess::getInstance()->runProcesses($processes);
         $filesystem = new Filesystem();
         try {
             $filesystem->copy('.env.local.php', '.env.php');
@@ -32,6 +32,7 @@ class CreateEnvPhp
         } catch (IOExceptionInterface $exception) {
             echo "An error occurred while dumping your file at " . $exception->getPath();
         }
+        NatInfos::getInstance()->io->progressAdvance(10);
         $message->getColoredMessage('.env.php done!', 'green');
     }
 }

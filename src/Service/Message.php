@@ -2,9 +2,6 @@
 
 namespace Nat\DeployBundle\Service;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 class Message
 {
     //singleton
@@ -15,18 +12,19 @@ class Message
 
     //to call the unique instance of this class form anywhere else you have to use : Message::getInstance();
 
-    public static function getInstance(InputInterface $input, OutputInterface $output)
+    public static function getInstance()
     {
         if (is_null(self::$_instance)) {
-            return self::$_instance = new Message($input, $output);
+            return self::$_instance = new Message();
         }
         return self::$_instance;
     }
 
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct()
     {
-        $this->input = $input;
-        $this->output = $output;
+        $infos = NatInfos::getInstance();
+        $this->input = $infos->input;
+        $this->output = $infos->output;
     }
 
     public function getColoredMessage(string|array $message, string $color)
