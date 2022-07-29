@@ -1,8 +1,13 @@
+[![English](/assets/en.png)](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.md)   [![Français](/assets/fr.png)](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.fr.md)
+
+
 # Bienvenue dans l'outil de déploiement de Nat 
-🌏[**English**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.md) / [**Français**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.fr.md)
+
 
               
-![Symfony](https://img.shields.io/badge/Symfony-white.svg?style=for-the-badge&logo=symfony&logoColor=black)[![heroku](https://img.shields.io/badge/Heroku-430098?logo=heroku&style=for-the-badge&logoColor=white)](https://dashboard.heroku.com/)![Commandline](https://img.shields.io/badge/-commandline-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=black&colorB=pink)
+![Commandline](https://img.shields.io/badge/-commandline-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white&colorB=purple)![Symfony](https://img.shields.io/badge/Symfony-white.svg?style=for-the-badge&logo=symfony&logoColor=black)[![heroku](https://img.shields.io/badge/Heroku-430098?logo=heroku&style=for-the-badge&logoColor=white)](https://dashboard.heroku.com/)
+
+
 Le but est déployer un projet `Symfony` sur `Heroku` avec un `ligne de commande` personnalisée.
 
 
@@ -45,7 +50,7 @@ Le but est déployer un projet `Symfony` sur `Heroku` avec un `ligne de commande
 composer require nat/deploy
 </code></pre></td></table>
 
-![9](/assets/9.png) Puis quand tout est prêt lance la commande suivante et suis les instructions
+![9](/assets/9.png) Puis quand tout est prêt lance la commande suivante et suis les instructions.
 
 <table><td><pre><code>
 php bin/console nat:heroku

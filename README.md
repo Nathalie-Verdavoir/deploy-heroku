@@ -1,8 +1,13 @@
+[![English](/assets/en.png)](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.md)   [![Français](/assets/fr.png)](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.fr.md)
+
+
 # Welcome in the deploying tool by Nat 
-🌏[**English**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.md) / [**Français**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.fr.md)
+
 
               
-![Symfony](https://img.shields.io/badge/Symfony-white.svg?style=for-the-badge&logo=symfony&logoColor=black)[![heroku](https://img.shields.io/badge/Heroku-430098?logo=heroku&style=for-the-badge&logoColor=white)](https://dashboard.heroku.com/)![Commandline](https://img.shields.io/badge/-commandline-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=black&colorB=pink)
+![Commandline](https://img.shields.io/badge/-commandline-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white&colorB=purple)![Symfony](https://img.shields.io/badge/Symfony-white.svg?style=for-the-badge&logo=symfony&logoColor=black)[![heroku](https://img.shields.io/badge/Heroku-430098?logo=heroku&style=for-the-badge&logoColor=white)](https://dashboard.heroku.com/)
+
+
 The goal is to deploy a `Symfony` project on `Heroku` with custom `command line`.
 
 
