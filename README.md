@@ -1,8 +1,8 @@
-# Welcome in the deploying tools
+# Welcome in the deploying tool by Nat 
+🌏[**English**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.md) / [**Français**](https://github.com/Nathalie-Verdavoir/deploy-heroku/blob/master/README.fr.md)
 
-`made by Nat` 
               
-
+![Symfony](https://img.shields.io/badge/Symfony-white.svg?style=for-the-badge&logo=symfony&logoColor=black)[![heroku](https://img.shields.io/badge/Heroku-430098?logo=heroku&style=for-the-badge&logoColor=white)](https://dashboard.heroku.com/)![Commandline](https://img.shields.io/badge/-commandline-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=black&colorB=pink)
 The goal is to deploy a `Symfony` project on `Heroku` with custom `command line`.
 
 
@@ -11,7 +11,7 @@ The goal is to deploy a `Symfony` project on `Heroku` with custom `command line`
 
 ## 10 Steps :
 
-![1](/assets/1.png) Prepare a notepad to paste the `3 infos` to answer my questions :)
+![1](/assets/1.png) Prepare a notepad 📝 to paste the `3 infos` to answer my questions :)
    
 
 ![2](/assets/2.png) You must have a `Symfony` project to deploy ;)
