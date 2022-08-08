@@ -51,7 +51,7 @@ class RunProcess
                 $this->getProcessMessages($proc);
 
                 //FOR CLEARDB_DATABASE_URL ONLY 
-                if ($proc[1] === 'config:get' && $proc[2] === 'CLEARDB_DATABASE_URL') {
+                if ($proc[1] === 'config:get' && $proc[2] === 'CLEARDB_NAT_URL') {
                     if (!str_contains($process->getOutput(), 'm')) {
                         echo 'Adding a new ClearDb database...';
                     } else {

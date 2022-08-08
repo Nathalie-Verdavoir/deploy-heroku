@@ -23,13 +23,6 @@ class CreateEnvPhp
         }
 
         try {
-            $devlocalphp = str_replace('prod','dev',file_get_contents('.env.local.php'));
-            $filesystem->dumpFile('.env.local.php', $devlocalphp);
-        } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while changing app_env to dev your file at " . $exception->getPath();
-        }
-
-        try {
             $filesystem->dumpFile('.env.php', "<?php
 
         return array (

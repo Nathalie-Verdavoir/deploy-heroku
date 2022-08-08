@@ -8,7 +8,7 @@ class AddClearDB
     {
         $infos = NatInfos::getInstance();
         $appName = '--app=' . $infos->herokuAppName;
-        $clearDbUrl = 'CLEARDB_DATABASE_URL';
+        $clearDbUrl = 'CLEARDB_NAT_URL';
         $message = Message::getInstance();
         $message->getColoredMessage(['Add ClearDb and setting APP_ENV in Heroku'], 'blue');
         $processes = [
@@ -17,7 +17,7 @@ class AddClearDB
         $infos->databaseUrl = $infos->natProcess->runProcesses($processes);
         if (!str_contains($infos->databaseUrl, 'm')) { // no database yet so it needs one
             $processes = [
-                ['heroku', 'addons:create', 'cleardb:ignite', $appName],
+                ['heroku', 'addons:create', 'cleardb:ignite', $appName, '--as=CLEARDB_NAT'],
                 ['heroku', 'config|grep', $clearDbUrl],
             ];
             $infos->natProcess->runProcesses($processes);

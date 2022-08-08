@@ -10,6 +10,7 @@
 namespace Nat\DeployBundle\Command\Deploy;
 
 use Nat\DeployBundle\Service\AddClearDB;
+use Nat\DeployBundle\Service\ChangeEnvLocalPhpToDev;
 use Nat\DeployBundle\Service\CheckForHerokuLogin;
 use Nat\DeployBundle\Service\CreateEnvPhp;
 use Nat\DeployBundle\Service\CreateHtaccess;
@@ -60,6 +61,8 @@ class Deploy extends Command
 
         new SetOtherVars();
 
+        new ChangeEnvLocalPhpToDev();
+        
         $this->infos->io->progressFinish(100);
 
         $this->message->getColoredMessage([
